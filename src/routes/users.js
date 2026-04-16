@@ -2,8 +2,20 @@ const express = require('express');
 const router = express.Router();
 const users = require('../data/users');
 
+function getUsersV1() {
+  return users
+}
+
+function getUsersV2() {
+  // Return non admin users and add "FLAGGED" in json response
+  const nonAdminUsers = users.filter(user => user.role !== 'admin');
+  const flaggedUsers = nonAdminUsers.map(user => ({ ...user, FLAGGED: true }));
+  return flaggedUsers
+}
+
 // GET /api/users
 router.get('/', (req, res) => {
+  const users = FEATURE ? getUsersV2() : getUsersV1();
   res.json(users);
 });
 
