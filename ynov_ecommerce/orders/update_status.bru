@@ -1,0 +1,17 @@
+meta {
+  name: update_status
+  type: http
+  seq: 4
+}
+
+patch {
+  url: http://localhost:3000/api/orders/2/status
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "delivered"
+  }
+}

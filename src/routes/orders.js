@@ -1,54 +1,61 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const orders = require('../data/orders');
+const { getDb } = require("../db");
+
+const VALID_STATUSES = ["pending", "shipped", "delivered", "cancelled"];
+
+function parseOrder(row) {
+  return { ...row, productIds: JSON.parse(row.productIds) };
+}
 
 // GET /api/orders
-router.get('/', (req, res) => {
+router.get("/", (_req, res) => {
+  const orders = getDb().prepare("SELECT * FROM orders").all().map(parseOrder);
   res.json(orders);
 });
 
 // GET /api/orders/:id
-router.get('/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const order = orders.find(o => o.id === id);
-  if (!order) {
-    return res.status(404).json({ error: 'Order not found' });
-  }
-  res.json(order);
+router.get("/:id", (req, res) => {
+  const row = getDb()
+    .prepare("SELECT * FROM orders WHERE id = ?")
+    .get(parseInt(req.params.id));
+  if (!row) return res.status(404).json({ error: "Order not found" });
+  res.json(parseOrder(row));
 });
 
 // POST /api/orders
-router.post('/', (req, res) => {
+router.post("/", (req, res) => {
   const { userId, productIds } = req.body;
   if (!userId || !productIds || !Array.isArray(productIds)) {
-    return res.status(400).json({ error: 'userId and productIds[] are required' });
+    return res
+      .status(400)
+      .json({ error: "userId and productIds[] are required" });
   }
-  const newOrder = {
-    id: orders.length + 1,
-    userId,
-    productIds,
-    total: 0,
-    status: 'pending',
-    createdAt: new Date().toISOString().split('T')[0],
-  };
-  orders.push(newOrder);
-  res.status(201).json(newOrder);
+  const createdAt = new Date().toISOString().split("T")[0];
+  const result = getDb()
+    .prepare(
+      "INSERT INTO orders (userId, productIds, total, status, createdAt) VALUES (?, ?, ?, ?, ?)",
+    )
+    .run(userId, JSON.stringify(productIds), 0, "pending", createdAt);
+  const newOrder = getDb()
+    .prepare("SELECT * FROM orders WHERE id = ?")
+    .get(result.lastInsertRowid);
+  res.status(201).json(parseOrder(newOrder));
 });
 
 // PATCH /api/orders/:id/status
-router.patch('/:id/status', (req, res) => {
+router.patch("/:id/status", (req, res) => {
   const id = parseInt(req.params.id);
-  const order = orders.find(o => o.id === id);
-  if (!order) {
-    return res.status(404).json({ error: 'Order not found' });
-  }
+  const row = getDb().prepare("SELECT * FROM orders WHERE id = ?").get(id);
+  if (!row) return res.status(404).json({ error: "Order not found" });
   const { status } = req.body;
-  const validStatuses = ['pending', 'shipped', 'delivered', 'cancelled'];
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({ error: `status must be one of: ${validStatuses.join(', ')}` });
+  if (!VALID_STATUSES.includes(status)) {
+    return res
+      .status(400)
+      .json({ error: `status must be one of: ${VALID_STATUSES.join(", ")}` });
   }
-  order.status = status;
-  res.json(order);
+  getDb().prepare("UPDATE orders SET status = ? WHERE id = ?").run(status, id);
+  res.json(parseOrder({ ...row, status }));
 });
 
 module.exports = router;
