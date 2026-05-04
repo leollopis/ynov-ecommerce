@@ -61,9 +61,7 @@ test("GET /api/orders après création", async () => {
 });
 
 test("GET /api/orders avant vs après patch", async () => {
-  const req1 = await request(app)
-    .get("/api/orders/2")
-    .expect(200);
+  const req1 = await request(app).get("/api/orders/2").expect(200);
   expect(req1.body).toHaveProperty("status", "pending");
 
   const req2 = await request(app)
@@ -83,3 +81,7 @@ test("GET /api/orders/999", async () => {
       expect(res.body).toHaveProperty("error", "Order not found");
     });
 });
+
+// test("TEST qui plante", async () => {
+//   expect(true).toBe(false);
+// });
