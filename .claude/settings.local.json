@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx jest *)",
+      "Bash(npm install *)",
+      "PowerShell(New-Item -ItemType Directory -Path \"c:\\\\Users\\\\leoll\\\\Desktop\\\\CICD\\\\ynov-ecommerce\\\\db\" -Force)",
+      "PowerShell(New-Item -ItemType File -Path \"c:\\\\Users\\\\leoll\\\\Desktop\\\\CICD\\\\ynov-ecommerce\\\\db\\\\.gitkeep\" -Force)",
+      "PowerShell(New-Item -ItemType Directory -Path \"c:\\\\Users\\\\leoll\\\\Desktop\\\\CICD\\\\ynov-ecommerce\\\\tests\\\\helpers\" -Force)",
+      "Bash(dir \"c:\\\\Users\\\\leoll\\\\Desktop\\\\CICD\\\\ynov-ecommerce\\\\ynov_ecommerce\")",
+      "PowerShell(New-Item -ItemType Directory -Path \"c:\\\\Users\\\\leoll\\\\Desktop\\\\CICD\\\\ynov-ecommerce\\\\ynov_ecommerce\\\\orders\" -Force)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(npm run *)"
+    ]
+  }
+}
