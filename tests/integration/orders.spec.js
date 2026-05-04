@@ -76,8 +76,8 @@ test("GET /api/orders avant vs après patch", async () => {
 test("GET /api/orders/999", async () => {
   await request(app)
     .get("/api/orders/999")
-    // No lint on test ? 
-      .expect(404)
+    // Lint corrigé
+    .expect(404)
     .then((res) => {
       expect(res.body).toHaveProperty("error", "Order not found");
     });
