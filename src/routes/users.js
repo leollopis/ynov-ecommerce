@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const users = require('../data/users');
 
+const FEATURE_V2_USERS = process.env.FEATURE_V2_USERS === 'true';
+
 function getUsersV1() {
   return users
 }
@@ -15,7 +17,7 @@ function getUsersV2() {
 
 // GET /api/users
 router.get('/', (req, res) => {
-  const users = FEATURE ? getUsersV2() : getUsersV1();
+  const users = FEATURE_V2_USERS ? getUsersV2() : getUsersV1();
   res.json(users);
 });
 
